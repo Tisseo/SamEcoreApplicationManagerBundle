@@ -13,13 +13,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
-    canal_tp_sam.perimeter.form.listener:
-        class: CanalTP\SamEcoreApplicationManagerBundle\Form\EventListener\PerimeterSubscriber
-        arguments:
-            - '@sam.business_component'
-            - '@security.context'
-            - '@fos_user.user_manager'
-
     canal_tp_sam.application.finder:
         class: CanalTP\SamEcoreApplicationManagerBundle\Services\ApplicationFinder
         arguments:

@@ -88,7 +88,7 @@ class ApplicationFinder
         return $apps;
     }
 
-    public function getBridgeApplicationBundles()
+    public function getApplicationBundles()
     {
         $applications = array();
         $kernel = $this->container->get('kernel');
@@ -99,12 +99,6 @@ class ApplicationFinder
                 $applications[] = [
                     'bundle' => $bundleName,
                     'app' => $bundle->getCanonicalName()
-                ];
-            } elseif (false !== strpos($bundleName, 'BridgeBundle')) {
-                $applications[] = [
-                    'bridge'    => $bundleName,
-                    'bundle'    => str_replace('Bridge', '', $bundleName),
-                    'app'       => strtolower(preg_replace('/^.+\\\\(\w+)BridgeBundle\\\\.+$/', '$1', get_class($bundle))),
                 ];
             }
         }

@@ -33,10 +33,10 @@ class ApplicationRoutingLoader extends Loader
         $this->loaded = true;
 
         $collection = new RouteCollection();
-        $applications = $this->applicationFinder->getBridgeApplicationBundles();
+        $applications = $this->applicationFinder->getApplicationBundles();
 
         foreach ($applications as $app) {
-            $resource = sprintf('@%s/Resources/config/routing.yml', isset($app['bridge']) ? $app['bridge'] : $app['bundle']);
+            $resource = sprintf('@%s/Resources/config/routing.yml', $app['bundle']);
             $applicationName = $app['app'];
             $type = 'yaml';
 

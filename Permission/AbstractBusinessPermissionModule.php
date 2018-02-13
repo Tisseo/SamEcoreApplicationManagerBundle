@@ -44,11 +44,6 @@ abstract class AbstractBusinessPermissionModule implements BusinessPermissionMod
                 $key
             );
         }
-        $permissions[] = $this->createBusinessPermission(
-            'permissions.business_manage_user_role.label',
-            'permissions.business_manage_user_role.description',
-            'BUSINESS_MANAGE_USER_ROLE'
-        );
 
         $this->permissionsObject = $permissions;
 

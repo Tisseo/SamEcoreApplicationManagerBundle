@@ -1,5 +1,1 @@
-# Permissions label
-permissions:
-    business_manage_user_role:
-        label: Gestion des roles pour les utilisateurs de l'application
-        description: Permet d'ajouter et supprimer un role à un utilisateur.
+

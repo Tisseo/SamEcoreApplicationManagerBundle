@@ -1,13 +1,13 @@
 canal_tp_sam_ecore_application_manager_choose_application:
-    pattern: /change/{application}
+    path: /change/{application}
     defaults: { _controller: CanalTPSamEcoreApplicationManagerBundle:Application:change }
 
 canal_tp_sam_ecore_application_manager_toolbar:
-    pattern: /toolbar
+    path: /toolbar
     defaults: { _controller: CanalTPSamEcoreApplicationManagerBundle:Application:toolbar }
 
 canal_tp_sam_show_changelog:
-    pattern:  /{canonicalName}/CHANGELOG.md
+    path:  /{canonicalName}/CHANGELOG.md
     defaults: { _controller: "CanalTPSamEcoreApplicationManagerBundle:Application:changelog" }
     requirements:
         canonicalName: -?[a-zA-Z]*

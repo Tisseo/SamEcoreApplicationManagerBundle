@@ -23,7 +23,7 @@ class CheckAccess
 
     public function onKernelRequest(GetResponseEvent $event)
     {
-        $token = $this->container->get('security.context')->getToken();
+        $token = $this->container->get('security.token_storage')->getToken();
         if (is_null($token) || $event->getRequestType() != HttpKernel::MASTER_REQUEST) {
             return;
         }

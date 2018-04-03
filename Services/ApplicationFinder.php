@@ -2,9 +2,12 @@
 
 namespace CanalTP\SamEcoreApplicationManagerBundle\Services;
 
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use CanalTP\SamEcoreApplicationManagerBundle\SamApplication;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * Allow to get application by several ways
@@ -13,19 +16,41 @@ use CanalTP\SamEcoreApplicationManagerBundle\SamApplication;
  */
 class ApplicationFinder
 {
+    /**
+     * @var \Symfony\Component\HttpFoundation\RequestStack
+     */
     protected $requestStack;
+
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
     protected $em;
-    protected $applicationEntityName;
-    protected $container;
+
+    /**
+     * @var \Symfony\Component\HttpKernel\HttpKernel
+     */
+    protected $kernel;
+
+    /**
+     * @var TokenStorage
+     */
+    protected $tokenStorage;
+
+    /**
+     * @var string
+     */
+    protected $appEntityNameFqcn;
+
 
     protected $currentApp = null;
 
-    public function __construct($container, $appEntityName)
+    public function __construct(EntityManager $em,  RequestStack $requestStack, Kernel $kernel, TokenStorage $tokenStorage, $appEntityNameFqcn)
     {
-        $this->requestStack = $container->get('request_stack');
-        $this->em = $container->get('doctrine.orm.entity_manager');
-        $this->applicationEntityName = $appEntityName;
-        $this->container = $container;
+        $this->requestStack = $requestStack;
+        $this->em = $em;
+        $this->kernel = $kernel;
+        $this->tokenStorage = $tokenStorage;
+        $this->applicationEntityNameFqcn = $appEntityNameFqcn;
     }
 
     public function findFromUrl()
@@ -33,11 +58,10 @@ class ApplicationFinder
         if (is_null($this->currentApp)) {
             $res = array();
             preg_match('/\/(\w+)/', $this->requestStack->getMasterRequest()->getPathInfo(), $res);
-            $appName = '';
 
             if (empty($res)) {
                 //Get first user's app
-                $userRoles = $this->container->get('security.context')->getToken()->getUser()->getUserRoles();
+                $userRoles = $this->tokenStorage->getToken()->getUser()->getUserRoles();
 
                 if (empty($userRoles)) {
                     throw new AccessDeniedException('Votre profil n\'a pas de rôle. Contactez un administrateur.');
@@ -53,7 +77,7 @@ class ApplicationFinder
                 $appName = 'samcore';
             }
 
-            $app = $this->em->getRepository($this->applicationEntityName)->findOneBy(array('canonicalName' => $appName));
+            $app = $this->em->getRepository($this->applicationEntityNameFqcn)->findOneBy(array('canonicalName' => $appName));
 
             $this->currentApp = $app;
         }
@@ -64,7 +88,7 @@ class ApplicationFinder
     public function getCurrentApp()
     {
         if ($this->requestStack->getCurrentRequest()->query->has('app')) {
-            $app = $this->em->getRepository($this->applicationEntityName)->findOneBy(
+            $app = $this->em->getRepository($this->applicationEntityNameFqcn)->findOneBy(
                 array(
                     'canonicalName' => $this->requestStack->getCurrentRequest()->query->get('app'),
                 )
@@ -91,8 +115,7 @@ class ApplicationFinder
     public function getApplicationBundles()
     {
         $applications = array();
-        $kernel = $this->container->get('kernel');
-        $bundles = $kernel->getBundles();
+        $bundles = $this->kernel->getBundles();
 
         foreach ($bundles as $bundleName => $bundle) {
             if ($bundle instanceof SamApplication) {

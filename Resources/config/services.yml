@@ -16,7 +16,10 @@ services:
     canal_tp_sam.application.finder:
         class: CanalTP\SamEcoreApplicationManagerBundle\Services\ApplicationFinder
         arguments:
-            - '@service_container'
+            - '@doctrine.orm.entity_manager'
+            - '@request_stack'
+            - '@kernel'
+            - '@security.token_storage'
             - CanalTP\SamCoreBundle\Entity\Application
 
     sam.business_component:
